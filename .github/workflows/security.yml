@@ -12,23 +12,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
       - run: npm install
-      - run: npx eslint . || true
+      - run: npx eslint . --format json -o eslint-report.json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-report.json
 
   trivy:
     name: Trivy Container Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker Image
-        run: docker build -t secure-app .
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@master
+      - run: docker build -t secure-app .
+      - run: trivy image --format json --output trivy-report.json secure-app || true
+      - uses: actions/upload-artifact@v4
         with:
-          image-ref: 'secure-app'
-          format: 'table'
-          exit-code: '0' # Don't fail the build on finding issues
+          name: trivy-report
+          path: trivy-report.json
+
