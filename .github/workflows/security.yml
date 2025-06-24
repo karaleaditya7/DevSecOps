@@ -23,14 +23,23 @@ jobs:
           path: eslint-report.json
 
   trivy:
-    name: Trivy Container Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: docker build -t secure-app .
-      - run: trivy image --format json --output trivy-report.json secure-app || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report
-          path: trivy-report.json
+  name: Trivy Container Scan
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Install Trivy
+      run: |
+        sudo apt-get update && sudo apt-get install -y wget
+        wget -qO- https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.deb > trivy.deb
+        sudo dpkg -i trivy.deb
+    - name: Build Docker Image
+      run: docker build -t secure-app .
+    - name: Run Trivy CLI Scan and Save Report
+      run: trivy image --format json --output trivy-report.json secure-app || true
+    - name: Upload Trivy Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-report
+        path: trivy-report.json
+
 
