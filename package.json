@@ -1,0 +1,13 @@
+{
+    "name": "secure-app",
+    "version": "1.0.0",
+    "main": "app/index.js",
+    "scripts": {
+      "lint": "eslint ."
+    },
+    "devDependencies": {
+      "eslint": "^8.0.0",
+      "eslint-plugin-security": "^1.7.1"
+    }
+  }
+  
